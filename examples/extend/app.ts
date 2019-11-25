@@ -29,7 +29,7 @@ import axios from '../../src/index'
 // axios.put('/extend/put', { msg: 'put' })
 //
 // axios.patch('/extend/patch', { msg: 'patch' })
-//
+
 // axios({
 //   url: '/extend/post',
 //   method: 'post',

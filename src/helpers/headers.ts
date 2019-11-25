@@ -1,4 +1,4 @@
-import { deepMerge, isPlainObject } from './util'
+import { isPlainObject, deepMerge } from './util'
 import { Method } from '../types'
 
 function normalizeHeaderName(headers: any, normalizedName: string): void {
@@ -21,11 +21,9 @@ export function processHeaders(headers: any, data: any): any {
       headers['Content-Type'] = 'application/json;charset=utf-8'
     }
   }
-
   return headers
 }
 
-// 处理返回值 headers
 export function parseHeaders(headers: string): any {
   let parsed = Object.create(null)
   if (!headers) {
@@ -33,15 +31,12 @@ export function parseHeaders(headers: string): any {
   }
 
   headers.split('\r\n').forEach(line => {
-    let [key, val] = line.split(':')
+    let [key, ...vals] = line.split(':')
     key = key.trim().toLowerCase()
     if (!key) {
       return
     }
-    if (val) {
-      val = val.trim()
-    }
-
+    const val = vals.join(':').trim()
     parsed[key] = val
   })
 

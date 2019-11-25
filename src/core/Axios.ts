@@ -1,13 +1,14 @@
 import {
-  AxiosPromise,
   AxiosRequestConfig,
+  AxiosPromise,
   AxiosResponse,
   Method,
-  RejectedFn,
-  ResolvedFn
+  ResolvedFn,
+  RejectedFn
 } from '../types'
-import dispatchRequest from './dispatchRequest'
+import dispatchRequest, { transformURL } from './dispatchRequest'
 import InterceptorManager from './InterceptorManager'
+import mergeConfig from './mergeConfig'
 
 interface Interceptors {
   request: InterceptorManager<AxiosRequestConfig>
@@ -31,7 +32,6 @@ export default class Axios {
     }
   }
 
-  // 重载方法request
   request(url: any, config?: any): AxiosPromise {
     if (typeof url === 'string') {
       if (!config) {
@@ -42,6 +42,9 @@ export default class Axios {
       config = url
     }
 
+    config = mergeConfig(this.defaults, config)
+    config.method = config.method.toLowerCase()
+
     const chain: PromiseChain<any>[] = [
       {
         resolved: dispatchRequest,
@@ -49,7 +52,6 @@ export default class Axios {
       }
     ]
 
-    // 添加拦截器
     this.interceptors.request.forEach(interceptor => {
       chain.unshift(interceptor)
     })
@@ -65,7 +67,6 @@ export default class Axios {
       promise = promise.then(resolved, rejected)
     }
 
-    // dispatchRequest(config)
     return promise
   }
 
@@ -95,6 +96,11 @@ export default class Axios {
 
   patch(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise {
     return this._requestMethodWithData('patch', url, data, config)
+  }
+
+  getUri(config?: AxiosRequestConfig): string {
+    config = mergeConfig(this.defaults, config)
+    return transformURL(config)
   }
 
   _requestMethodWithoutData(

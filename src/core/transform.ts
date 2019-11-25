@@ -9,12 +9,10 @@ export default function transform(
     return data
   }
   if (!Array.isArray(fns)) {
-    fns = []
+    fns = [fns]
   }
-
   fns.forEach(fn => {
     data = fn(data, headers)
   })
-
   return data
 }
